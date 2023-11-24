@@ -1,13 +1,15 @@
 apply plugin: 'com.android.library'
 
 repositories {
+    google()
+    mavenCentral()
     jcenter()
 }
 
 dependencies {
-   compile 'com.android.support:support-v4:26.0.2'
-    compile 'com.android.support:support-annotations:26.0.2'
-    compile 'com.android.support:recyclerview-v7:26.0.2'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+
 }
 
 android {
@@ -18,4 +20,3 @@ android {
     }
 }
 
-apply from: '../maven_push.gradle'
