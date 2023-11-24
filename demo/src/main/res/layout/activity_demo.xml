@@ -17,6 +17,8 @@
     <!--  umanoParallaxOffset 视差效果的处理  -->
     <!--  umanoScrollableView  嵌套滚动的处理  -->
     <!--  umanoFadeColor  视差颜色  -->
+    <!--    todo 还差一个效果的处理，就是开启多少就算开启了，目前是一半-->
+
     <!-- MAIN CONTENT -->
     <FrameLayout
         android:id="@+id/main_content"

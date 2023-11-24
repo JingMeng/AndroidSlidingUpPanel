@@ -25,6 +25,16 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
 /**
  * https://github.com/JingMeng/AndroidSlidingUpPanel/tree/05278e7048369d4799511e07c8ddf7c1f64bdc25#caveats-additional-features-and-customization
+ * <p>
+ * 释放的时候托管了，托管给了 ViewDragHelper
+ * <p>
+ * <p>
+ * SlidingUpPanelLayout#ViewDragHelper.Callback#onViewReleased  这个就实现了
+ * <p>
+ * https://www.jianshu.com/p/a9e0a98e4d42
+ * <p>
+ * 需要从这个这个地方那个打印一下，看看松手走了那个if判断
+ * {@link SlidingUpPanelLayout.DragHelperCallback#onViewReleased }
  */
 public class DemoActivity extends AppCompatActivity {
     private static final String TAG = "DemoActivity";
