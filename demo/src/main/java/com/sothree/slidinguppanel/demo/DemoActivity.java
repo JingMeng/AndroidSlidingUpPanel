@@ -1,5 +1,6 @@
 package com.sothree.slidinguppanel.demo;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -18,15 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
-import java.util.Arrays;
-import java.util.List;
-
+/**
+ * https://github.com/JingMeng/AndroidSlidingUpPanel/tree/05278e7048369d4799511e07c8ddf7c1f64bdc25#caveats-additional-features-and-customization
+ */
 public class DemoActivity extends AppCompatActivity {
     private static final String TAG = "DemoActivity";
 
@@ -37,54 +36,10 @@ public class DemoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+        setSupportActionBar(findViewById(R.id.main_toolbar));
 
-        ListView lv = (ListView) findViewById(R.id.list);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        List<String> your_array_list = Arrays.asList(
-                "This",
-                "Is",
-                "An",
-                "Example",
-                "ListView",
-                "That",
-                "You",
-                "Can",
-                "Scroll",
-                ".",
-                "It",
-                "Shows",
-                "How",
-                "Any",
-                "Scrollable",
-                "View",
-                "Can",
-                "Be",
-                "Included",
-                "As",
-                "A",
-                "Child",
-                "Of",
-                "SlidingUpPanelLayout"
-        );
-
-        // This is the array adapter, it takes the context of the activity as a
-        // first parameter, the type of list view as a second parameter and your
-        // array as a third parameter.
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                your_array_list );
-
-        lv.setAdapter(arrayAdapter);
-
-        mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        mLayout = findViewById(R.id.sliding_layout);
         mLayout.addPanelSlideListener(new PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -103,19 +58,40 @@ public class DemoActivity extends AppCompatActivity {
             }
         });
 
+
+        daggerData();
+    }
+
+    private void daggerData() {
+
+        setUpListData();
+
+
         TextView t = (TextView) findViewById(R.id.name);
         t.setText(Html.fromHtml(getString(R.string.hello)));
         Button f = (Button) findViewById(R.id.follow);
         f.setText(Html.fromHtml(getString(R.string.follow)));
         f.setMovementMethod(LinkMovementMethod.getInstance());
-        f.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("http://www.twitter.com/umanoapp"));
-                startActivity(i);
-            }
+        f.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse("http://www.twitter.com/umanoapp"));
+            startActivity(i);
         });
+    }
+
+    private void setUpListData() {
+        ListView lv = findViewById(R.id.list);
+        lv.setOnItemClickListener((parent, view, position, id) -> Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show());
+
+        // This is the array adapter, it takes the context of the activity as a
+        // first parameter, the type of list view as a second parameter and your
+        // array as a third parameter.
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                Data.your_array_list);
+
+        lv.setAdapter(arrayAdapter);
     }
 
     @Override
@@ -138,9 +114,11 @@ public class DemoActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    //这个在8.0将会不安全了，不是final的了
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_toggle: {
                 if (mLayout != null) {
                     if (mLayout.getPanelState() != PanelState.HIDDEN) {
@@ -156,6 +134,7 @@ public class DemoActivity extends AppCompatActivity {
             case R.id.action_anchor: {
                 if (mLayout != null) {
                     if (mLayout.getAnchorPoint() == 1.0f) {
+                        //允许在中间位置展开，设置比例锚点
                         mLayout.setAnchorPoint(0.7f);
                         mLayout.setPanelState(PanelState.ANCHORED);
                         item.setTitle(R.string.action_anchor_disable);
