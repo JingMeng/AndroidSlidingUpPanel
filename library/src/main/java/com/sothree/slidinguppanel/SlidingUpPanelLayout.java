@@ -122,6 +122,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * True if the collapsed panel should be dragged up.
+     * <p>
+     * 这个并不是标记是向上的还是向下滑动的
      */
     private boolean mIsSlidingUp;
 
@@ -722,6 +724,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mFirstLayout = true;
     }
 
+
+    /**
+     * 和这个的操作几乎是一致的
+     *
+     * @param widthMeasureSpec  horizontal space requirements as imposed by the parent.
+     *                          The requirements are encoded with
+     *                          {@link android.view.View.MeasureSpec}.
+     * @param heightMeasureSpec vertical space requirements as imposed by the parent.
+     *                          The requirements are encoded with
+     *                          {@link android.view.View.MeasureSpec}.
+     * @see android.widget.ScrollView   throw new IllegalStateException("ScrollView can host only one direct child");
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -737,10 +751,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         final int childCount = getChildCount();
 
+
         if (childCount != 2) {
             throw new IllegalStateException("Sliding up panel layout must have exactly 2 children!");
         }
 
+        /**
+         * 这个地方那个如果换一个就会出问题了
+         */
         mMainView = getChildAt(0);
         mSlideableView = getChildAt(1);
         if (mDragView == null) {
@@ -1100,7 +1118,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     public void setPanelState(PanelState state) {
 
         // Abort any running animation, to allow state change
-        if(mDragHelper.getViewDragState() == ViewDragHelper.STATE_SETTLING){
+        if (mDragHelper.getViewDragState() == ViewDragHelper.STATE_SETTLING) {
             Log.d(TAG, "View is settling. Aborting animation.");
             mDragHelper.abort();
         }
@@ -1146,10 +1164,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     /**
+     * 注销掉这个地方就没有动画了
+     * <p>
+     * 根据当前幻灯片偏移更新视差。
+     * <p>
      * Update the parallax based on the current slide offset.
      */
     @SuppressLint("NewApi")
     private void applyParallaxForCurrentSlideOffset() {
+
+        //todo  需要判断当前是展开还是收缩的状态，决定使用那种动画
+        //然后根据偏移量决定使用的程度
+        Log.i("SlidingUpPanelLayout", "-------applyParallaxForCurrentSlideOffset--------------");
         if (mParallaxOffset > 0) {
             int mainViewOffset = getCurrentParallaxOffset();
             ViewCompat.setTranslationY(mMainView, mainViewOffset);
@@ -1398,27 +1424,43 @@ public class SlidingUpPanelLayout extends ViewGroup {
             // direction is always positive if we are sliding in the expanded direction
             float direction = mIsSlidingUp ? -yvel : yvel;
 
+            Log.i("SlidingUpPanelLayout", "---------onViewReleased------------");
             if (direction > 0 && mSlideOffset <= mAnchorPoint) {
                 // swipe up -> expand and stop at anchor point
                 target = computePanelTopPosition(mAnchorPoint);
+                Log.i("SlidingUpPanelLayout", "---------111111111111------------");
             } else if (direction > 0 && mSlideOffset > mAnchorPoint) {
                 // swipe up past anchor -> expand
                 target = computePanelTopPosition(1.0f);
+                Log.i("SlidingUpPanelLayout", "---------222222222222222------------");
             } else if (direction < 0 && mSlideOffset >= mAnchorPoint) {
                 // swipe down -> collapse and stop at anchor point
                 target = computePanelTopPosition(mAnchorPoint);
+                Log.i("SlidingUpPanelLayout", "---------3333333333------------");
             } else if (direction < 0 && mSlideOffset < mAnchorPoint) {
                 // swipe down past anchor -> collapse
                 target = computePanelTopPosition(0.0f);
+                Log.i("SlidingUpPanelLayout", "---------44444444444------------");
             } else if (mSlideOffset >= (1.f + mAnchorPoint) / 2) {
                 // zero velocity, and far enough from anchor point => expand to the top
                 target = computePanelTopPosition(1.0f);
+                Log.i("SlidingUpPanelLayout", "---------5555555555------------");
             } else if (mSlideOffset >= mAnchorPoint / 2) {
+                /**
+                 * 不改动，执行这个
+                 *
+                 * 这个地方需要改动一下
+                 * 1. 向上的时候，滑动超过 1/3松手就是向上的 ，内部的view后面的view是一个向上消失的动画
+                 * 2. 向下的时候，滑动如果超过了 1/3就自动打开，这个时候是一个放大，透明度渐变的动画
+                 *
+                 */
                 // zero velocity, and close enough to anchor point => go to anchor
                 target = computePanelTopPosition(mAnchorPoint);
+                Log.i("SlidingUpPanelLayout", "---------6666666666------------" + direction);
             } else {
                 // settle at the bottom
                 target = computePanelTopPosition(0.0f);
+                Log.i("SlidingUpPanelLayout", "---------77777777777777------------");
             }
 
             if (mDragHelper != null) {
