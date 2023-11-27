@@ -1169,13 +1169,21 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * 根据当前幻灯片偏移更新视差。
      * <p>
      * Update the parallax based on the current slide offset.
+     * <p>
+     * <p>
+     * <p>
+     * mLastNotDraggingSlideState  这个状态就是记忆的最终上次的事展开的还是关闭的，可以判断这个来判断方向
+     * <p>
+     * mSlideState 是当前的状态，目前暂时没有用
+     * <p>
+     * 剩下的和  onViewReleased 一起做个判断处理
      */
     @SuppressLint("NewApi")
     private void applyParallaxForCurrentSlideOffset() {
 
         //todo  需要判断当前是展开还是收缩的状态，决定使用那种动画
         //然后根据偏移量决定使用的程度
-        Log.i("SlidingUpPanelLayout", "-------applyParallaxForCurrentSlideOffset--------------");
+        Log.i("SlidingUpPanelLayout", mLastNotDraggingSlideState + "-------applyParallaxForCurrentSlideOffset--------------" + mSlideState);
         if (mParallaxOffset > 0) {
             int mainViewOffset = getCurrentParallaxOffset();
             ViewCompat.setTranslationY(mMainView, mainViewOffset);
