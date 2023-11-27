@@ -9,6 +9,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,15 +58,35 @@ public class MainActivity extends AppCompatActivity {
         translationYAnimator.setInterpolator(interpolator);
         translationZAnimator.setInterpolator(interpolator);
 
-        view.post(() -> {
-            final int targetWidth = viewRoot.getWidth();
-            ViewGroup.LayoutParams params = view.getLayoutParams();
-
-            params.width = targetWidth - dpToPx(80);
-        });
+        /**
+         *     extracted(view, viewRoot); 的代码
+         */
+//        view.post(() -> {
+//            final int targetWidth = viewRoot.getWidth();
+//            ViewGroup.LayoutParams params = view.getLayoutParams();
+//
+//            params.width = targetWidth - dpToPx(80);
+//        });
 
         findViewById(R.id.start).setOnClickListener(v -> {
 //            extracted(view);
+            //设置的数值合理了，就没有之前的拉伸的效果了
+//            code(view);
+//            scale(view);
+
+
+
+            // 创建 ObjectAnimator 实例，view
+            ObjectAnimator translateAnimator = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 0f, -view.getHeight());
+
+            // 设置动画的持续时间
+            translateAnimator.setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime));
+
+            // 设置动画的插值器
+            translateAnimator.setInterpolator(new android.view.animation.AccelerateInterpolator());
+
+            // 启动动画
+            translateAnimator.start();
 
 
             //这个感觉也不对
@@ -73,6 +95,40 @@ public class MainActivity extends AppCompatActivity {
 
 //        translationXAnimator.start();
 //        translationYAnimator.start();
+    }
+
+    private void code(View view) {
+        int duration2 = 8000;
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, View.SCALE_X, 0.85f, 1f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.9f, 1f);
+        scaleX.setDuration(duration2);
+        scaleY.setDuration(duration2);
+
+        scaleX.start();
+        scaleY.start();
+    }
+
+    /**
+     * 这个动画效果就可以的 但是可控性没有那么好
+     *
+     * @param view
+     */
+    private void scale(View view) {
+        // 创建缩放动画
+        Animation scaleAnimation = new ScaleAnimation(
+                0.85f, // fromXScale
+                1.0f, // toXScale
+                0.9f, // fromYScale
+                1.0f, // toYScale
+                Animation.RELATIVE_TO_SELF, 0.5f, // pivotXType, pivotXValue (50% of width)
+                Animation.RELATIVE_TO_SELF, 0.5f  // pivotYType, pivotYValue (50% of height)
+        );
+
+        // 设置动画持续时间
+        scaleAnimation.setDuration(1000);
+
+        // 启动动画
+        view.startAnimation(scaleAnimation);
     }
 
     private void extracted(View view, View viewRoot) {
