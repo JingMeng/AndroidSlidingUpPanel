@@ -45,7 +45,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Default initial state for the component
      */
-    private static PanelState DEFAULT_SLIDE_STATE = PanelState.COLLAPSED;
+    private static final PanelState DEFAULT_SLIDE_STATE = PanelState.COLLAPSED;
 
     /**
      * Default height of the shadow above the peeking out panel
@@ -102,6 +102,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Drawable used to draw the shadow between panes.
+     * <p>
+     * Drawable 用于在窗格之间绘制阴影。
      */
     private final Drawable mShadowDrawable;
 
@@ -129,6 +131,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Panel overlays the windows instead of putting it underneath it.
+     * <p>
+     * 这个理解为，可以滑动的图层在主要的图层上面
      */
     private boolean mOverlayContent = DEFAULT_OVERLAY_FLAG;
 
@@ -351,6 +355,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     /**
+     * 这个一般用作查找view
+     * <p>
      * Set the Drag View after the view is inflated
      */
     @Override
@@ -364,11 +370,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
 
+    /**
+     * 感觉必要写死，但是就是这么一个事情，最终的结果只能是展开和关闭两种情况
+     *
+     * @param gravity
+     */
     public void setGravity(int gravity) {
         if (gravity != Gravity.TOP && gravity != Gravity.BOTTOM) {
             throw new IllegalArgumentException("gravity must be set to either top or bottom");
         }
         mIsSlidingUp = gravity == Gravity.BOTTOM;
+
+        //还没有测量就不需要测量了，否则执行   requestLayout()  这个是一个优化的策略
         if (!mFirstLayout) {
             requestLayout();
         }
@@ -890,6 +903,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mFirstLayout = false;
     }
 
+
+    /**
+     * 是否是首次绘制的判断就是这么简单的就可以被记录控制
+     *
+     * @param w    Current width of this view.
+     * @param h    Current height of this view.
+     * @param oldw Old width of this view.
+     * @param oldh Old height of this view.
+     */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -1218,12 +1240,22 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
 
+    /**
+     * {@link  ViewGroup#dispatchDraw(Canvas)} 里面调用了 drawChild
+     * {@link  View#draw(Canvas)}   dispatchDraw 是  draw的6个步骤中的第四个
+     *
+     * @param canvas      The canvas on which to draw the child
+     * @param child       Who to draw
+     * @param drawingTime The time at which draw is occurring
+     * @return
+     */
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         boolean result;
         final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
 
-        if (mSlideableView != null && mSlideableView != child) { // if main view
+        if (mSlideableView != null && mSlideableView != child) {
+            // if main view  针对主界面进行了处理
             // Clip against the slider; no sense drawing what will immediately be covered,
             // Unless the panel is set to overlay content
             canvas.getClipBounds(mTmpRect);
@@ -1290,6 +1322,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
 
+    /**
+     * 不太重要，直接忽略，就是两个 panes 之间的一些细节调整，目前不知道具体的作用
+     * above_shadow.xml
+     * below_shadow.xml  这两个 xml 的颜色你修改一下就能看出来效果
+     *
+     * @param c The Canvas to which the View is rendered.
+     */
     @Override
     public void draw(Canvas c) {
         super.draw(c);
@@ -1322,6 +1361,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * @param x      X coordinate of the active touch point
      * @param y      Y coordinate of the active touch point
      * @return true if child views of v can be scrolled by delta of dx.
+     * @see android.widget.ScrollView
+     * <p>
+     * android.widget.ScrollView#canScroll()
+     * <p>
+     * 暂时没用的方法，不做分析
      */
     protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
         if (v instanceof ViewGroup) {
@@ -1344,47 +1388,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
 
-    @Override
-    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams();
-    }
-
-    @Override
-    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        return p instanceof MarginLayoutParams
-                ? new LayoutParams((MarginLayoutParams) p)
-                : new LayoutParams(p);
-    }
-
-    @Override
-    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
-        return p instanceof LayoutParams && super.checkLayoutParams(p);
-    }
-
-    @Override
-    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new LayoutParams(getContext(), attrs);
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("superState", super.onSaveInstanceState());
-        bundle.putSerializable(SLIDING_STATE, mSlideState != PanelState.DRAGGING ? mSlideState : mLastNotDraggingSlideState);
-        return bundle;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof Bundle) {
-            Bundle bundle = (Bundle) state;
-            mSlideState = (PanelState) bundle.getSerializable(SLIDING_STATE);
-            mSlideState = mSlideState == null ? DEFAULT_SLIDE_STATE : mSlideState;
-            state = bundle.getParcelable("superState");
-        }
-        super.onRestoreInstanceState(state);
-    }
-
+    /**
+     * ViewDragHelper 的基本使用
+     */
     private class DragHelperCallback extends ViewDragHelper.Callback {
 
         @Override
@@ -1494,6 +1500,73 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
 
+
+    /**
+     * 数据的保存
+     *
+     * @return
+     */
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("superState", super.onSaveInstanceState());
+        bundle.putSerializable(SLIDING_STATE, mSlideState != PanelState.DRAGGING ? mSlideState : mLastNotDraggingSlideState);
+        return bundle;
+    }
+
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
+            Bundle bundle = (Bundle) state;
+            mSlideState = (PanelState) bundle.getSerializable(SLIDING_STATE);
+            mSlideState = mSlideState == null ? DEFAULT_SLIDE_STATE : mSlideState;
+            state = bundle.getParcelable("superState");
+        }
+        super.onRestoreInstanceState(state);
+    }
+
+    /**
+     * {@link  ViewGroup#generateDefaultLayoutParams()}
+     * <p>
+     * 这个确实做了更改，之前是自适应的，目前这个地方是占用父布局的宽度的
+     */
+    @Override
+    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams();
+    }
+
+    /**
+     * @param p The layout parameters to convert into a suitable set of layout parameters
+     *          for this ViewGroup.
+     *          <p>
+     *          <p>
+     *          {@link  ViewGroup#generateLayoutParams(ViewGroup.LayoutParams)} ()}
+     *          和这个写法是一致的
+     *          {@link  android.widget.FrameLayout#generateLayoutParams(ViewGroup.LayoutParams)} ()}
+     * @return
+     */
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof MarginLayoutParams
+                ? new LayoutParams((MarginLayoutParams) p)
+                : new LayoutParams(p);
+    }
+
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof LayoutParams && super.checkLayoutParams(p);
+    }
+
+    @Override
+    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+
+    /**
+     * 基本的自定义布局操作
+     */
     public static class LayoutParams extends ViewGroup.MarginLayoutParams {
         private static final int[] ATTRS = new int[]{
                 android.R.attr.layout_weight

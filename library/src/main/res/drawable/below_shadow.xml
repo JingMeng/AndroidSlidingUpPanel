@@ -5,4 +5,10 @@
         android:endColor="@android:color/transparent"
         android:angle="270" >
     </gradient>
+
+<!--    <gradient-->
+<!--        android:startColor="@android:color/holo_red_light"-->
+<!--        android:endColor="@android:color/holo_purple"-->
+<!--        android:angle="270" >-->
+<!--    </gradient>-->
 </shape>
