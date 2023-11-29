@@ -554,19 +554,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mDragView.setClickable(true);
             mDragView.setFocusable(false);
             mDragView.setFocusableInTouchMode(false);
-            mDragView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!isEnabled() || !isTouchEnabled()) return;
-                    if (mSlideState != PanelState.EXPANDED && mSlideState != PanelState.ANCHORED) {
-                        if (mAnchorPoint < 1.0f) {
-                            setPanelState(PanelState.ANCHORED);
-                        } else {
-                            setPanelState(PanelState.EXPANDED);
-                        }
+            //就是设置了一个简单的点击事件
+            mDragView.setOnClickListener(v -> {
+                if (!isEnabled() || !isTouchEnabled()) return;
+                if (mSlideState != PanelState.EXPANDED && mSlideState != PanelState.ANCHORED) {
+                    if (mAnchorPoint < 1.0f) {
+                        setPanelState(PanelState.ANCHORED);
                     } else {
-                        setPanelState(PanelState.COLLAPSED);
+                        setPanelState(PanelState.EXPANDED);
                     }
+                } else {
+                    setPanelState(PanelState.COLLAPSED);
                 }
             });
             ;
@@ -981,6 +979,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
         return mDragHelper.shouldInterceptTouchEvent(ev);
     }
 
+    /**
+     * 多加了一点判断，似乎没有什么不一样
+     * https://github.com/JingMeng/HenCoderPlus/blob/master/15_drag_nestedscroll/src/main/java/com/hencoder/a15_drag_nestedscroll/view/drag/DragUpDownLayout.java#L42
+     *
+     * @param ev The motion event.
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         if (!isEnabled() || !isTouchEnabled()) {
@@ -1160,6 +1165,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mSlideableView.setVisibility(View.VISIBLE);
                 requestLayout();
             }
+            /**
+             * 百分比滑动距离设置
+             */
             switch (state) {
                 case ANCHORED:
                     smoothSlideTo(mAnchorPoint, 0);
@@ -1243,6 +1251,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * {@link  ViewGroup#dispatchDraw(Canvas)} 里面调用了 drawChild
      * {@link  View#draw(Canvas)}   dispatchDraw 是  draw的6个步骤中的第四个
+     * <p>
+     * <p>
+     * 渐变的颜色就是从这里实现的
      *
      * @param canvas      The canvas on which to draw the child
      * @param child       Who to draw
@@ -1258,8 +1269,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
             // if main view  针对主界面进行了处理
             // Clip against the slider; no sense drawing what will immediately be covered,
             // Unless the panel is set to overlay content
+            //获取裁剪范围
             canvas.getClipBounds(mTmpRect);
+
+            Log.i("SlidingUpPanelLayout", "----drawChild----------11111111111111111--------------" + mTmpRect);
             if (!mOverlayContent) {
+                /**
+                 * mIsSlidingUp 模式底部对齐，向上滑动
+                 *
+                 */
                 if (mIsSlidingUp) {
                     mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
                 } else {
@@ -1269,6 +1287,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (mClipPanel) {
                 canvas.clipRect(mTmpRect);
             }
+            Log.i("SlidingUpPanelLayout", mOverlayContent + "----drawChild----------2222222222222--------------" + mTmpRect);
 
             result = super.drawChild(canvas, child, drawingTime);
 
@@ -1276,6 +1295,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 final int baseAlpha = (mCoveredFadeColor & 0xff000000) >>> 24;
                 final int imag = (int) (baseAlpha * mSlideOffset);
                 final int color = imag << 24 | (mCoveredFadeColor & 0xffffff);
+                /**
+                 * 就是计算了一个颜色
+                 * 这个颜色的区域是 mTmpRect
+                 */
                 mCoveredFadePaint.setColor(color);
                 canvas.drawRect(mTmpRect, mCoveredFadePaint);
             }
@@ -1291,7 +1314,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Smoothly animate mDraggingPane to the target X position within its range.
      *
-     * @param slideOffset position to animate to
+     * @param slideOffset position to animate to 滑動偏移量
      * @param velocity    initial velocity in case of fling, or 0.
      */
     boolean smoothSlideTo(float slideOffset, int velocity) {
@@ -1310,6 +1333,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
         return false;
     }
 
+    /**
+     * 这个之前讲解过
+     * https://github.com/JingMeng/HenCoderPlus/blob/master/15_drag_nestedscroll/src/main/java/com/hencoder/a15_drag_nestedscroll/view/drag/DragUpDownLayout.java#L48
+     */
     @Override
     public void computeScroll() {
         if (mDragHelper != null && mDragHelper.continueSettling(true)) {
@@ -1317,7 +1344,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mDragHelper.abort();
                 return;
             }
-
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
