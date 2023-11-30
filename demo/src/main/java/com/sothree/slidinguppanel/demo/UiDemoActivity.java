@@ -25,6 +25,8 @@ public class UiDemoActivity extends AppCompatActivity {
 
         /**
          * 仿照微信的那个
+         *
+         * 至于换成view，那就是一个 url 的问题，至于原位置有显示的，那就看一下 上面的 drag_listener_grid_view 处理
          */
 //        setContentView(R.layout.drag_to_collect);
         /**
