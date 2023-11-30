@@ -16,6 +16,9 @@ public class UiDemoActivity extends AppCompatActivity {
          */
 //        setContentView(R.layout.drag_helper_grid_view);
         /**
+         *
+         * https://blog.csdn.net/qq_31339141/article/details/107597055
+         *
          * 加强版本
          */
         setContentView(R.layout.drag_listener_grid_view);
