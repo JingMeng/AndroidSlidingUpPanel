@@ -49,7 +49,7 @@ public class DragToCollectLayout extends RelativeLayout {
         @Override
         public boolean onDrag(View v, DragEvent event) {
             Log.i("DragToCollectLayout", "---------------------" + event.getAction());
-            //ACTION_DRAG_STARTED--- 这个就可以仿照微信的来处理
+            //todo ：ACTION_DRAG_STARTED--- 这个就可以仿照微信的来处理
             switch (event.getAction()) {
                 case DragEvent.ACTION_DROP:
                     if (v instanceof LinearLayout) {
