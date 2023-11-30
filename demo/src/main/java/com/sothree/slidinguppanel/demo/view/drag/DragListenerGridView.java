@@ -2,6 +2,7 @@ package com.sothree.slidinguppanel.demo.view.drag;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -30,14 +31,17 @@ public class DragListenerGridView extends ViewGroup {
         super.onFinishInflate();
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
-            orderedChildren.add(child); // 初始化位置
-            child.setOnLongClickListener(new OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    draggedView = v;
-                    v.startDrag(null, new DragShadowBuilder(v), v, 0);
-                    return false;
-                }
+            /**
+             *  初始化位置
+             *  默认顺序
+             *
+             */
+            orderedChildren.add(child);
+            child.setOnLongClickListener(v -> {
+                //点击之后就知道 draggedView
+                draggedView = v;
+                v.startDrag(null, new DragShadowBuilder(v), v, 0);
+                return false;
             });
             child.setOnDragListener(dragListener);
         }
@@ -73,9 +77,15 @@ public class DragListenerGridView extends ViewGroup {
         }
     }
 
+    /**
+     * 因为这个有自己的区域，还有别人的区域使用的事一半做的标记
+     */
     private class HenDragListener implements OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
+
+//            Log.i("DragListenerGridView", v+"-------------onDrag-----------------"+event);
+
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     if (event.getLocalState() == v) {
@@ -83,6 +93,23 @@ public class DragListenerGridView extends ViewGroup {
                     }
                     break;
                 case DragEvent.ACTION_DRAG_ENTERED:
+
+//                    try {
+//                        throw new RuntimeException("----------DragEvent.ACTION_DRAG_ENTERED--------------------");
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+                    /**
+                     * 进入监听的范围，这个范围写法不一样了，因为本身就在这个范围内 ------------- 这句话是错误的
+                     * 这个v并不是当前view本身   是遮盖的那个view  ，可以看 DragToCollectLayout
+                     *
+                     * 官方文件解释：
+                     * 拖动阴影刚刚进入拖动事件监听器的 View 的边界框。这是在拖动阴影进入边界框时，监听器收到的第一个事件操作类型。
+                     *
+                     *
+                     */
+                    Log.i("DragListenerGridView", event.getLocalState() + "--------------------" + v + "--------HenDragListener--------" + (event.getLocalState() != v));
+                    //排除自己
                     if (event.getLocalState() != v) {
                         sort(v);
                     }
@@ -108,13 +135,19 @@ public class DragListenerGridView extends ViewGroup {
                 draggedIndex = i;
             }
         }
-        if (targetIndex < draggedIndex) {
-            orderedChildren.remove(draggedIndex);
-            orderedChildren.add(targetIndex, draggedView);
-        } else if (targetIndex > draggedIndex) {
-            orderedChildren.remove(draggedIndex);
-            orderedChildren.add(targetIndex, draggedView);
-        }
+
+        Log.i("DragListenerGridView", targetIndex + "--------sort--------" + draggedIndex);
+//        if (targetIndex < draggedIndex) {
+//            orderedChildren.remove(draggedIndex);
+//            orderedChildren.add(targetIndex, draggedView);
+//        } else if (targetIndex > draggedIndex) {
+//            orderedChildren.remove(draggedIndex);
+//            orderedChildren.add(targetIndex, draggedView);
+//        }
+
+        orderedChildren.remove(draggedIndex);
+        orderedChildren.add(targetIndex, draggedView);
+
         int childLeft;
         int childTop;
         int childWidth = getWidth() / COLUMNS;

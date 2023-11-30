@@ -21,14 +21,18 @@ public class UiDemoActivity extends AppCompatActivity {
          *
          * 加强版本
          */
-        setContentView(R.layout.drag_listener_grid_view);
+//        setContentView(R.layout.drag_listener_grid_view);
 
         /**
          * 仿照微信的那个
          *
          * 至于换成view，那就是一个 url 的问题，至于原位置有显示的，那就看一下 上面的 drag_listener_grid_view 处理
+         *
+         * 这个测试的时候，也几乎是一半才能起作用
+         *
+         * todo：但是微信的朋友圈发布图片是触碰了就会触发
          */
-//        setContentView(R.layout.drag_to_collect);
+        setContentView(R.layout.drag_to_collect);
         /**
          *
          * 这个效果其实就是不错的

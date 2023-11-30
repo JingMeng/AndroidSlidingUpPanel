@@ -3,6 +3,7 @@ package com.sothree.slidinguppanel.demo.view.drag;
 import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,13 +21,10 @@ public class DragToCollectLayout extends RelativeLayout {
     ImageView logoView;
     LinearLayout collectorLayout;
 
-    OnLongClickListener dragStarter = new OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            //传递的数据
-            ClipData imageData = ClipData.newPlainText("name", v.getContentDescription());
-            return ViewCompat.startDragAndDrop(v, imageData, new DragShadowBuilder(v), null, 0);
-        }
+    OnLongClickListener dragStarter = v -> {
+        //传递的数据
+        ClipData imageData = ClipData.newPlainText("name", v.getContentDescription());
+        return ViewCompat.startDragAndDrop(v, imageData, new DragShadowBuilder(v), null, 0);
     };
     OnDragListener dragListener = new CollectListener();
 
@@ -50,6 +48,8 @@ public class DragToCollectLayout extends RelativeLayout {
     class CollectListener implements OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
+            Log.i("DragToCollectLayout", "---------------------" + event.getAction());
+            //ACTION_DRAG_STARTED--- 这个就可以仿照微信的来处理
             switch (event.getAction()) {
                 case DragEvent.ACTION_DROP:
                     if (v instanceof LinearLayout) {

@@ -5,33 +5,50 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <View
-        android:id="@+id/view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#EF5350" />
+    <LinearLayout
+        android:id="@+id/view111"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#EF5350" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#FDD835" />
+    </LinearLayout>
 
     <View
+        android:id="@+id/view222"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#9C27B0" />
 
     <View
+        android:id="@+id/view333"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#1E88E5" />
 
     <View
+        android:id="@+id/view444"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00695C" />
 
     <View
+        android:id="@+id/view555"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#FDD835" />
 
     <View
+        android:id="@+id/view666"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#546E7A" />

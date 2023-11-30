@@ -21,6 +21,16 @@ public class DragHelperGridView extends ViewGroup {
         dragHelper = ViewDragHelper.create(this, new DragCallback());
     }
 
+    /**
+     * 这个是相当简单了，只要敢写就应该没有问题
+     *
+     * @param widthMeasureSpec  horizontal space requirements as imposed by the parent.
+     *                          The requirements are encoded with
+     *                          {@link android.view.View.MeasureSpec}.
+     * @param heightMeasureSpec vertical space requirements as imposed by the parent.
+     *                          The requirements are encoded with
+     *                          {@link android.view.View.MeasureSpec}.
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int specWidth = MeasureSpec.getSize(widthMeasureSpec);
@@ -34,8 +44,18 @@ public class DragHelperGridView extends ViewGroup {
         setMeasuredDimension(specWidth, specHeight);
     }
 
+    /**
+     * 这个是相当简单了，只要敢写就应该没有问题
+     *
+     * @param changed This is a new size or position for this view
+     * @param l       Left position, relative to parent
+     * @param t       Top position, relative to parent
+     * @param r       Right position, relative to parent
+     * @param b       Bottom position, relative to parent
+     */
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        //xml里面写死的数量
         int count = getChildCount();
         int childLeft;
         int childTop;
@@ -43,7 +63,9 @@ public class DragHelperGridView extends ViewGroup {
         int childHeight = getHeight() / ROWS;
         for (int index = 0; index < count; index++) {
             View child = getChildAt(index);
+            //因为就只有两个，所以就这么计算了左侧的距离
             childLeft = index % 2 * childWidth;
+            //这个高度使用的除数 不是取余
             childTop = index / 2 * childHeight;
             child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
         }
@@ -81,6 +103,7 @@ public class DragHelperGridView extends ViewGroup {
             if (state == ViewDragHelper.STATE_IDLE) {
                 View capturedView = dragHelper.getCapturedView();
                 if (capturedView != null) {
+                    //这个操作是为了突出显示
                     capturedView.setElevation(capturedView.getElevation() - 1);
                 }
             }
@@ -128,6 +151,7 @@ public class DragHelperGridView extends ViewGroup {
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
+            //回归到原始的捕获坐标点
             dragHelper.settleCapturedViewAt((int) capturedLeft, (int) capturedTop);
             postInvalidateOnAnimation();
         }
