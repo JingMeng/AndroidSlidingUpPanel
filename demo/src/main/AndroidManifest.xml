@@ -5,10 +5,10 @@
     android:versionCode="17"
     android:versionName="3.4.0">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="17"
-        tools:overrideLibrary="android.support.v7.appcompat,android.support.graphics.drawavle" />
+<!--    <uses-sdk-->
+<!--        android:minSdkVersion="14"-->
+<!--        android:targetSdkVersion="17"-->
+<!--        tools:overrideLibrary="android.support.v7.appcompat,android.support.graphics.drawavle" />-->
 
     <application
         android:allowBackup="true"
@@ -16,22 +16,33 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".UiDemoActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
-        <activity
-            android:name=".DemoActivity"
-            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".DemoActivity"
+            android:label="@string/app_name">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
         </activity>
     </application>
 

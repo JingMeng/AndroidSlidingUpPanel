@@ -18,5 +18,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+    }
 }
 
