@@ -2,7 +2,10 @@ package com.sothree.slidinguppanel.demo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 public class UiDemoActivity extends AppCompatActivity {
 
@@ -39,5 +42,36 @@ public class UiDemoActivity extends AppCompatActivity {
          *
          */
 //        setContentView(R.layout.drag_up_down);
+
+        basic1();
+
+        basic();
+    }
+
+    private void basic() {
+        View view1 = findViewById(R.id.avatarView);
+        View view2 = findViewById(R.id.collectorLayout);
+        if (view1.getRight() > view2.getLeft()
+                && view1.getLeft() < view2.getRight()
+                && view1.getBottom() > view2.getTop()
+                && view1.getTop() < view2.getBottom()) {
+            // 两个视图重叠
+            Log.i("UiDemoActivity","-----basic-------------basic----------------");
+        } else {
+            // 两个视图不重叠
+        }
+    }
+
+    private void basic1() {
+        View view1 = new View(this);
+        View view2 = new View(this);
+        Rect rect1 = new Rect(view1.getLeft(), view1.getTop(), view1.getRight(), view1.getBottom());
+        Rect rect2 = new Rect(view2.getLeft(), view2.getTop(), view2.getRight(), view2.getBottom());
+
+        if (rect1.intersect(rect2)) {
+            // 两个视图重叠
+        } else {
+            // 两个视图不重叠
+        }
     }
 }
