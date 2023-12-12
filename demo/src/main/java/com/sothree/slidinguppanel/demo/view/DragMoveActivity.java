@@ -51,7 +51,7 @@ public class DragMoveActivity extends AppCompatActivity {
 
             double distance = Math.sqrt(Math.pow(centerXView1 - centerXView2, 2) + Math.pow(centerYView1 - centerYView2, 2));
 
-            Log.i("DragMoveActivity", "----------两个视图重叠---distance-----" + distance);
+//            Log.i("DragMoveActivity", "----------两个视图重叠---distance-----" + distance);
 
             // 设定阈值
             double threshold = 100.0;
@@ -75,10 +75,10 @@ public class DragMoveActivity extends AppCompatActivity {
 
         view2.setMyOnTouchListener((v, event) -> {
 
-//            int x = (int) event.getRawX();
-//            int y = (int) event.getRawY();
-            int x = (int) event.getX();
-            int y = (int) event.getY();
+            int x = (int) event.getRawX();
+            int y = (int) event.getRawY();
+//            int x = (int) event.getX();
+//            int y = (int) event.getY();
 
             Rect rect1 = new Rect(view1.getLeft(), view1.getTop(), view1.getRight(), view1.getBottom());
             switch (event.getAction()) {
@@ -96,10 +96,15 @@ public class DragMoveActivity extends AppCompatActivity {
                     lastX = x;
                     lastY = y;
                     Rect rect2 = new Rect(view2.getLeft() + offsetX, view2.getTop() + offsetY, view2.getRight() + offsetX, view2.getBottom() + offsetY);
-                    return rect2.intersect(rect1);
+                    boolean intersect = rect2.intersect(rect1);
+                    Log.i("DragMoveActivity", offsetX+"-----------观察点------------" + intersect);
+                    return intersect;
             }
             //默认不拦截
-            return false;
+            Rect rect2 = new Rect(view2.getLeft(), view2.getTop(), view2.getRight(), view2.getBottom());
+            boolean intersect = rect2.intersect(rect1);
+            Log.i("DragMoveActivity", "-----------变化点------------" + intersect);
+            return intersect;
         });
 
     }

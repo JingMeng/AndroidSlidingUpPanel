@@ -31,11 +31,11 @@ public class FollowFingerView extends View {
     @SuppressLint("ClickableViewAccessibility")
     private void init() {
         setOnTouchListener((v, event) -> {
-//            int x = (int) event.getRawX();
-//            int y = (int) event.getRawY();
+            int x = (int) event.getRawX();
+            int y = (int) event.getRawY();
 
-            int x = (int) event.getX();
-            int y = (int) event.getY();
+//            int x = (int) event.getX();
+//            int y = (int) event.getY();
 
             if (null != onTouchListener) {
                 boolean b = onTouchListener.onTouch(v, event);
