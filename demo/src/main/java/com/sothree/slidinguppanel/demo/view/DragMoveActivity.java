@@ -25,8 +25,21 @@ public class DragMoveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drag_move);
 
 
+        View root = findViewById(R.id.root);
+
         FollowFingerView view1 = findViewById(R.id.drag_move1);
         FollowFingerView view2 = findViewById(R.id.drag_move2);
+
+        root.post(() -> {
+            int width = root.getWidth();
+            int height = root.getHeight();
+            view1.setMaxBottom(height);
+            view1.setMaxRight(width);
+
+            view2.setMaxBottom(height);
+            view2.setMaxRight(width);
+        });
+
 
 
         view1.setMyOnTouchListener((v, event) -> {
@@ -97,7 +110,7 @@ public class DragMoveActivity extends AppCompatActivity {
                     lastY = y;
                     Rect rect2 = new Rect(view2.getLeft() + offsetX, view2.getTop() + offsetY, view2.getRight() + offsetX, view2.getBottom() + offsetY);
                     boolean intersect = rect2.intersect(rect1);
-                    Log.i("DragMoveActivity", offsetX+"-----------观察点------------" + intersect);
+                    Log.i("DragMoveActivity", offsetX + "-----------观察点------------" + intersect);
                     return intersect;
             }
             //默认不拦截
