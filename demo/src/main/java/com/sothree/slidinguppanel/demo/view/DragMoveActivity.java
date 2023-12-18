@@ -14,6 +14,8 @@ import com.sothree.slidinguppanel.demo.R;
 
 /**
  * 这个布局使用 Linerlayout 会出现问题，但是使用 FrameLayout 是没有问题的
+ * <p>
+ * ViewDragHelper  接触判断  --- 这个地方就是接触(这样就不用那么纠结了)
  */
 public class DragMoveActivity extends AppCompatActivity {
     private int lastX, lastY;
@@ -202,6 +204,8 @@ public class DragMoveActivity extends AppCompatActivity {
             }
             /**
              * 这个的判断条件和上面是一致的
+             *
+             * 相交就只有这一种情形，两个手交叉一下就好了
              */
             boolean b = view1.getRight() > view2.getLeft()
                     && view1.getLeft() < view2.getRight()
