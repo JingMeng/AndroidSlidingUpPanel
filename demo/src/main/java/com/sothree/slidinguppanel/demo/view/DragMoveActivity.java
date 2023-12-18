@@ -41,7 +41,6 @@ public class DragMoveActivity extends AppCompatActivity {
         });
 
 
-
         view1.setMyOnTouchListener((v, event) -> {
             /**
              * 这个方法最起码是起作用的
@@ -105,11 +104,28 @@ public class DragMoveActivity extends AppCompatActivity {
                     int offsetX = x - lastX;
                     int offsetY = y - lastY;
 
-                    // 保存当前位置
-                    lastX = x;
-                    lastY = y;
+
                     Rect rect2 = new Rect(view2.getLeft() + offsetX, view2.getTop() + offsetY, view2.getRight() + offsetX, view2.getBottom() + offsetY);
                     boolean intersect = rect2.intersect(rect1);
+
+                    /**
+                     * 判断覆盖的错误就是出自这里，
+                     * 要是没有接触才能继续赋值，不然你重新处理就会导致覆盖
+                     *
+                     *
+                     * ----------------------------------------
+                     * 但是还是会产生就是手指头从这边滑动到另一边view一下子飞过去了
+                     *
+                     *  这个滑动事件应该给取消掉
+                     *
+                     */
+
+
+                    if (!intersect) {
+                        // 保存当前位置
+                        lastX = x;
+                        lastY = y;
+                    }
                     Log.i("DragMoveActivity", offsetX + "-----------观察点------------" + intersect);
                     return intersect;
             }
