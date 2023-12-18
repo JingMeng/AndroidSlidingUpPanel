@@ -105,6 +105,9 @@ public class DragMoveActivity extends AppCompatActivity {
                     int offsetY = y - lastY;
 
 
+                    /**
+                     * 先加上的目的是为了避免 接触之后无法离开的问题
+                     */
                     Rect rect2 = new Rect(view2.getLeft() + offsetX, view2.getTop() + offsetY, view2.getRight() + offsetX, view2.getBottom() + offsetY);
                     boolean intersect = rect2.intersect(rect1);
 
