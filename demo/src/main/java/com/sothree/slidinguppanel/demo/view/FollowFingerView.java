@@ -40,6 +40,37 @@ public class FollowFingerView extends View {
         this.maxBottom = maxBottom;
     }
 
+    public boolean dispatchTouchEvent(MotionEvent event) {
+
+
+        boolean b = super.dispatchTouchEvent(event);
+        Log.i("FollowFingerView", "------dispatchTouchEvent--------------------------" + b);
+        return b;
+
+    }
+
+    /**
+     * @param event The motion event.
+     * @return
+     * @see ViewGroup
+     * <p>
+     * {@link  ViewGroup#dispatchTouchEvent(MotionEvent)}
+     * <p>
+     * 一旦分发会之一分发的，需要复习了
+     * <p>
+     * -------FollowFingerView------init------执行了----
+     * ------onTouchEvent--------------------------false
+     * ------dispatchTouchEvent--------------------------false
+     * 这个是因为还在继续分发导致的
+     * ------dispatchTouchEvent--------------------------true
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean b = super.onTouchEvent(event);
+        Log.i("FollowFingerView", "------onTouchEvent--------------------------" + b);
+        return b;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void init() {
         setOnTouchListener((v, event) -> {
@@ -53,7 +84,11 @@ public class FollowFingerView extends View {
                 boolean b = onTouchListener.onTouch(v, event);
                 if (b) {
                     //不允许重叠的操作，如果重叠了，啥也不做，就是消耗事件
-                    return b;
+//                    return b;
+
+                    Log.i("FollowFingerView", "-------FollowFingerView------init------执行了----");
+                    // fixme 修正数据：当发生重叠的时候就不要再消耗事件了，就解决了滑动出view的布局反而弹跳了
+                    return false;
                 }
             }
             switch (event.getAction()) {
