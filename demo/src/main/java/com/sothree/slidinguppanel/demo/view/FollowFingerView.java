@@ -3,6 +3,7 @@ package com.sothree.slidinguppanel.demo.view;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,47 @@ public class FollowFingerView extends View {
         this.onTouchListener = onTouchListener;
     }
 
+    private int maxRight;
+    private int maxBottom;
+
+    public void setMaxRight(int maxRight) {
+        this.maxRight = maxRight;
+    }
+
+    public void setMaxBottom(int maxBottom) {
+        this.maxBottom = maxBottom;
+    }
+
+    public boolean dispatchTouchEvent(MotionEvent event) {
+
+
+        boolean b = super.dispatchTouchEvent(event);
+        Log.i("FollowFingerView", "------dispatchTouchEvent--------------------------" + b);
+        return b;
+
+    }
+
+    /**
+     * @param event The motion event.
+     * @return
+     * @see ViewGroup
+     * <p>
+     * {@link  ViewGroup#dispatchTouchEvent(MotionEvent)}
+     * <p>
+     * 一旦分发会之一分发的，需要复习了
+     * <p>
+     * -------FollowFingerView------init------执行了----
+     * ------onTouchEvent--------------------------false
+     * ------dispatchTouchEvent--------------------------false
+     * 这个是因为还在继续分发导致的
+     * ------dispatchTouchEvent--------------------------true
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean b = super.onTouchEvent(event);
+        Log.i("FollowFingerView", "------onTouchEvent--------------------------" + b);
+        return b;
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     private void init() {
@@ -38,7 +80,17 @@ public class FollowFingerView extends View {
 //            int x = (int) event.getX();
 //            int y = (int) event.getY();
 
+            if (null != onTouchListener) {
+                boolean b = onTouchListener.onTouch(v, event);
+                if (b) {
+                    //不允许重叠的操作，如果重叠了，啥也不做，就是消耗事件
+//                    return b;
 
+                    Log.i("FollowFingerView", "-------FollowFingerView------init------执行了----");
+                    // fixme 修正数据：当发生重叠的时候就不要再消耗事件了，就解决了滑动出view的布局反而弹跳了
+                    return false;
+                }
+            }
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     // 记录手指按下时的位置
@@ -46,13 +98,6 @@ public class FollowFingerView extends View {
                     lastY = y;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    if (null != onTouchListener) {
-                        boolean b = onTouchListener.onTouch(v, event);
-                        if (b) {
-                            //不允许重叠的操作，如果重叠了，啥也不做，就是消耗事件
-                            return b;
-                        }
-                    }
                     // 计算手指移动的距离
                     int offsetX = x - lastX;
                     int offsetY = y - lastY;
@@ -62,8 +107,58 @@ public class FollowFingerView extends View {
 //                    layoutParams.leftMargin = getLeft() + offsetX;
 //                    layoutParams.topMargin = getTop() + offsetY;
 //                    setLayoutParams(layoutParams);
-                    offsetLeftAndRight(offsetX);
-                    offsetTopAndBottom(offsetY);
+
+                    int left = getLeft() + offsetX;
+                    int right = getRight() + offsetX;
+
+                    int top = getTop() + offsetY;
+                    int bottom = getBottom() + offsetY;
+
+                    /**
+                     * 边界探测，探测是别超出屏幕的四周
+                     */
+
+                    if (false) {
+                        left = Math.min(left, maxRight - getWidth());
+                        left = Math.max(left, 0);
+                        //最大为 maxRight-getWidth()
+                        right = Math.min(right, maxRight);
+                        right = Math.max(right, 0);
+
+                        top = Math.max(0, top);
+                        top = Math.min(top, maxBottom);
+
+                        bottom = Math.min(bottom, maxBottom);
+                        bottom = Math.max(bottom, 0);
+                        //上面越界会导致界面的改动----就是大小的改变
+                    }
+
+                    if (true) {
+                        //这个就可以预防上下
+                        if (top < 0) {
+                            top = 0;
+                            bottom = getHeight();
+                        }
+                        if (bottom > maxBottom) {
+                            bottom = maxBottom;
+                            top = maxBottom - getHeight();
+                        }
+
+                        if (left < 0) {
+                            left = 0;
+                            right = getWidth();
+                        }
+                        if (right > maxRight) {
+                            right = maxRight;
+                            left = maxRight - getWidth();
+                        }
+                    }
+
+                    layout(left, top, right, bottom);
+
+//                    offsetLeftAndRight(offsetX);
+//                    offsetTopAndBottom(offsetY);
+
                     // 保存当前位置
                     lastX = x;
                     lastY = y;

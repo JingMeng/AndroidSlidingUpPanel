@@ -14,6 +14,8 @@ import com.sothree.slidinguppanel.demo.R;
 
 /**
  * 这个布局使用 Linerlayout 会出现问题，但是使用 FrameLayout 是没有问题的
+ * <p>
+ * ViewDragHelper  接触判断  --- 这个地方就是接触(这样就不用那么纠结了)
  */
 public class DragMoveActivity extends AppCompatActivity {
     private int lastX, lastY;
@@ -25,8 +27,20 @@ public class DragMoveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drag_move);
 
 
+        View root = findViewById(R.id.root);
+
         FollowFingerView view1 = findViewById(R.id.drag_move1);
         FollowFingerView view2 = findViewById(R.id.drag_move2);
+
+        root.post(() -> {
+            int width = root.getWidth();
+            int height = root.getHeight();
+            view1.setMaxBottom(height);
+            view1.setMaxRight(width);
+
+            view2.setMaxBottom(height);
+            view2.setMaxRight(width);
+        });
 
 
         view1.setMyOnTouchListener((v, event) -> {
@@ -92,12 +106,32 @@ public class DragMoveActivity extends AppCompatActivity {
                     int offsetX = x - lastX;
                     int offsetY = y - lastY;
 
-                    // 保存当前位置
-                    lastX = x;
-                    lastY = y;
+
+                    /**
+                     * 先加上的目的是为了避免 接触之后无法离开的问题
+                     */
                     Rect rect2 = new Rect(view2.getLeft() + offsetX, view2.getTop() + offsetY, view2.getRight() + offsetX, view2.getBottom() + offsetY);
                     boolean intersect = rect2.intersect(rect1);
-                    Log.i("DragMoveActivity", offsetX+"-----------观察点------------" + intersect);
+
+                    /**
+                     * 判断覆盖的错误就是出自这里，
+                     * 要是没有接触才能继续赋值，不然你重新处理就会导致覆盖
+                     *
+                     *
+                     * ----------------------------------------
+                     * 但是还是会产生就是手指头从这边滑动到另一边view一下子飞过去了
+                     *
+                     *  这个滑动事件应该给取消掉
+                     *
+                     */
+
+
+                    if (!intersect) {
+                        // 保存当前位置
+                        lastX = x;
+                        lastY = y;
+                    }
+                    Log.i("DragMoveActivity", offsetX + "-----------观察点------------" + intersect);
                     return intersect;
             }
             //默认不拦截
@@ -170,6 +204,8 @@ public class DragMoveActivity extends AppCompatActivity {
             }
             /**
              * 这个的判断条件和上面是一致的
+             *
+             * 相交就只有这一种情形，两个手交叉一下就好了
              */
             boolean b = view1.getRight() > view2.getLeft()
                     && view1.getLeft() < view2.getRight()

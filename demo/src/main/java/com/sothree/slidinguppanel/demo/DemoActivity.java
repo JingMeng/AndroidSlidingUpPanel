@@ -37,6 +37,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
  * {@link SlidingUpPanelLayout.DragHelperCallback#onViewReleased }
  */
 public class DemoActivity extends AppCompatActivity {
+
+    com.sothree.slidinguppanel.demo.R r;
     private static final String TAG = "DemoActivity";
 
     private SlidingUpPanelLayout mLayout;
