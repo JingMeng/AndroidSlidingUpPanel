@@ -3,7 +3,6 @@ apply plugin: 'com.android.library'
 repositories {
     google()
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -13,14 +12,18 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    namespace 'com.sothree.slidinguppanel.library'
+    compileSdkVersion 34
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
     lintOptions {
         abortOnError false
     }
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 34
     }
 }
 
